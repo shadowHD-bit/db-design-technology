@@ -86,16 +86,31 @@ GROUP BY st.Фамилия, st.Имя, st.Отчество
 
 -- Вывести ФИО студентов, имеющих не более одной тройки.
 
-
+SELECT st.Фамилия, st.Имя, st.Отчество
+FROM dbo.Студенты as st
+INNER JOIN dbo.[Зачетная ведомость] as zv ON zv.[ID студента] = st.[ID студента]
+WHERE zv.Отметка = 3
+GROUP BY st.Фамилия, st.Имя, st.Отчество
+HAVING count(zv.[ID дисциплины в семестре]) <=1
 
 
 -- Вывести ФИО студентов, имеющих только отметки «отлично».
 
-
+SELECT st.Фамилия, st.Имя, st.Отчество
+FROM dbo.Студенты as st
+INNER JOIN dbo.[Зачетная ведомость] as zv ON zv.[ID студента] = st.[ID студента]
+GROUP BY st.Фамилия, st.Имя, st.Отчество
+HAVING sum(CASE WHEN zv.Отметка = 5 THEN 1 ELSE 0 END) = count(zv.Отметка)
 
 
 -- Вывести ФИО студентов с указанием среднего балла по результа-там обучения в каждой группе.
 
+SELECT st.Фамилия, st.Имя, st.Отчество, gr.Наименование, AVG(zv.Балл) as 'Ср. Балл'
+FROM dbo.Студенты as st
+INNER JOIN dbo.[Студенты в группах] as stgr ON stgr.[ID студента] = st.[ID студента]
+INNER JOIN dbo.Группы as gr ON gr.[ID группы] = stgr.[ID группы]
+INNER JOIN dbo.[Зачетная ведомость] as zv ON zv.[ID студента] = st.[ID студента]
+GROUP BY st.Фамилия, st.Имя, st.Отчество, gr.Наименование
 
 
 
